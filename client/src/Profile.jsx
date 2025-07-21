@@ -1,6 +1,24 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import SkillForm from "./components/SkillForm";
+
+function App() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  return (
+    <div className="App">
+      <h1>Hackathon: Learning Neighbors</h1>
+
+      {user && token ? (
+        <SkillForm userId={user.id} token={token} />
+      ) : (
+        <p>Please log in to access skill features.</p>
+      )}
+    </div>
+  );
+}
 
 function Profile() {
   const [profile, setProfile] = useState(null);
