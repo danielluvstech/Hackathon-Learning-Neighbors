@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import Register from './Register.jsx';
 import Login from './Login.jsx';
-import Profile from './Profile.jsx';
-import PrivateRoute from './components/PrivateRoute'; // if not already added, do it!
+import Profile from './Profile';
+import SwapRequests from './pages/SwapRequests';
+import SubmitReview from './pages/SubmitReview';
 
 function App() {
   const navigate = useNavigate();
@@ -15,25 +16,24 @@ function App() {
 
   return (
     <div>
-      <nav>
+      <nav style={{ marginBottom: '1rem' }}>
         <Link to="/register">Register</Link> |{' '}
         <Link to="/login">Login</Link> |{' '}
         <Link to="/profile">Profile</Link> |{' '}
-        <button onClick={handleLogout}>Logout</button>
+        <Link to="/swap-requests">Swap Requests</Link> |{' '}
+        <Link to="/submit-review">Submit Review</Link> |{' '}
+        <button onClick={handleLogout} style={{ cursor: 'pointer' }}>
+          Logout
+        </button>
       </nav>
 
       <Routes>
         <Route path="/" element={<Navigate to="/register" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/swap-requests" element={<SwapRequests />} />
+        <Route path="/submit-review" element={<SubmitReview />} />
       </Routes>
     </div>
   );

@@ -18,6 +18,7 @@ export default function Login() {
 
       const data = await res.json();
       if (res.ok) {
+        console.log('Login success:', data);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
         navigate('/profile'); // ✅ Redirect here
