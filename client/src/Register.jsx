@@ -20,7 +20,7 @@ export default function Register() {
       const data = await res.json();
       if (res.ok) {
         alert('Registration successful! You can now log in.');
-        navigate('/login'); // ✅ go to login after register
+        // navigate('/login'); // ✅ go to login after register
       } else {
         alert(data.error || 'Registration failed');
       }

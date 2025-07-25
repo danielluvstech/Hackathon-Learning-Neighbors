@@ -1,31 +1,31 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await fetch('http://localhost:3001/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post('http://localhost:3001/api/login', {
+        email,
+        password
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-        navigate('/profile'); // ✅ Redirect here
-      } else {
-        alert(data.error || 'Login failed');
-      }
-    } catch (err) {
-      alert('Error logging in');
+      const { token, user } = response.data;
+
+      // ✅ Save to localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // ✅ Navigate to profile
+      navigate('/profile');
+
+    } catch (error) {
+      alert(error.response?.data?.error || 'Login failed');
     }
   };
 
@@ -37,15 +37,19 @@ export default function Login() {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-      /><br />
+        required
+      />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      /><br />
+        required
+      />
       <button type="submit">Login</button>
     </form>
   );
 }
+
+export default Login;
 

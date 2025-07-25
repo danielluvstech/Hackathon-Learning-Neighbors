@@ -1,31 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function SwapRequests() {
   const [requests, setRequests] = useState([]);
   const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/swap-requests', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => setRequests(res.data.requests))
-    .catch(err => console.error('Error fetching requests:', err));
+    fetchRequests();
   }, []);
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  const fetchRequests = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/api/swap-requests', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRequests(res.data.requests);
+    } catch (err) {
+      console.error('❌ Error fetching swap requests:', err);
+    }
+  };
+
+  const handleAction = async (id, status) => {
     try {
       await axios.patch(
         `http://localhost:3001/api/swap-requests/${id}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
-      setRequests(prev =>
-        prev.map(req => req.id === id ? { ...req, status: newStatus } : req)
-      );
+      alert(`Request ${status}`);
+      fetchRequests(); // refresh requests
     } catch (err) {
-      console.error('Error updating status:', err);
-      alert('Failed to update request status.');
+      console.error('❌ Error updating swap request:', err);
+      alert('Failed to update request.');
     }
   };
 
@@ -33,21 +42,31 @@ function SwapRequests() {
     <div>
       <h2>Swap Requests</h2>
       {requests.length === 0 ? (
-        <p>No swap requests.</p>
+        <p>No swap requests yet.</p>
       ) : (
         <ul>
           {requests.map((req) => (
             <li key={req.id}>
-              Skill ID: {req.skill_id} | From User: {req.from_user_id} → To User: {req.to_user_id}
-              <br />
-              Message: {req.message}
-              <br />
-              Status: {req.status || 'pending'}
-              {req.to_user_id === JSON.parse(localStorage.getItem("user"))?.id && req.status === 'pending' && (
-                <>
-                  <button onClick={() => handleStatusUpdate(req.id, 'accepted')}>Accept</button>
-                  <button onClick={() => handleStatusUpdate(req.id, 'rejected')}>Reject</button>
-                </>
+              <strong>{req.skill_name}</strong> — from <strong>{req.from_username}</strong> to <strong>{req.to_username}</strong>
+              <p><em>{req.message}</em></p>
+              <p>Status: {req.status}</p>
+
+              {/* ✅ If request is TO the logged-in user → show Accept/Reject */}
+              {req.to_user_id === user.id && req.status === 'pending' && (
+                <div>
+                  <button onClick={() => handleAction(req.id, 'accepted')}>✅ Accept</button>
+                  <button onClick={() => handleAction(req.id, 'rejected')}>❌ Reject</button>
+                </div>
+              )}
+
+              {/* ✅ If request is FROM the logged-in user → show waiting message */}
+              {req.from_user_id === user.id && req.status === 'pending' && (
+                <p>⏳ Waiting for response...</p>
+              )}
+
+              {/* ✅ If request is completed → show final status */}
+              {req.status !== 'pending' && (
+                <p><strong>✔ This request has been {req.status}</strong></p>
               )}
             </li>
           ))}

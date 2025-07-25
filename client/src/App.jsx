@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
 import Register from './Register.jsx';
 import Login from './Login.jsx';
 import Profile from './Profile.jsx';
-import PrivateRoute from './components/PrivateRoute'; // if not already added, do it!
+import SwapRequests from './pages/SwapRequests';
 
 function App() {
   const navigate = useNavigate();
@@ -14,26 +14,27 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="container">
       <nav>
-        <Link to="/register">Register</Link> |{' '}
-        <Link to="/login">Login</Link> |{' '}
-        <Link to="/profile">Profile</Link> |{' '}
-        <button onClick={handleLogout}>Logout</button>
+        <div className="nav-left">
+          <Link to="/register">Register</Link>
+          <Link to="/login">Login</Link>
+          <Link to="/profile">Profile</Link>
+        </div>
+
+        <div className="nav-title">Neighbor Skill Swap</div>
+
+        <div className="nav-right">
+          <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        </div>
       </nav>
 
       <Routes>
         <Route path="/" element={<Navigate to="/register" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/swap-requests" element={<SwapRequests />} />
       </Routes>
     </div>
   );
